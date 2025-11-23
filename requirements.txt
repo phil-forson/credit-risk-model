@@ -2,4 +2,4 @@ flask
 pandas
 xgboost
 scikit-learn
-
+gunicorn
