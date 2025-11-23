@@ -1,0 +1,27 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data (ignore large raw files, keep outputs needed for model)
+train_data.csv
+train_labels.csv
+outputs/dev_sample_raw.csv.gz
+outputs/dev_sample_agg.csv.gz
+
+# Note: We are intentionally NOT ignoring outputs/xgb_final.json 
+# because you need it for deployment.
+
