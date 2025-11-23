@@ -2,10 +2,13 @@ import json
 import pandas as pd
 import xgboost as xgb
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 
 # Initialize Flask app
 app = Flask(__name__)
+# Enable CORS for all domains (simplest fix for public APIs)
+CORS(app)
 
 # 1. Load the model at startup
 # Ensure the model path is correct relative to this file
@@ -76,4 +79,3 @@ def predict():
 if __name__ == '__main__':
     # Run the server on port 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
-
