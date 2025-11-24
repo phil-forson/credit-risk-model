@@ -83,7 +83,13 @@ def predict():
         if len(shap_vals) > 0:
             # shap_vals is a matrix (rows x cols), take first row
             vals = shap_vals[0]
-            base = float(base_value) if isinstance(base_value, (float, int)) else float(base_value[0])
+            
+            # Safely handle base_value (can be scalar or array)
+            try:
+                base = float(base_value)
+            except (TypeError, ValueError, IndexError):
+                # Fallback if it's an array/list
+                base = float(base_value[0])
             
             for i, col in enumerate(EXPECTED_FEATURES):
                 explanation.append({
