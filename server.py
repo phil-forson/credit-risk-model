@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import xgboost as xgb
+import shap
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
@@ -14,11 +15,18 @@ CORS(app)
 # Ensure the model path is correct relative to this file
 MODEL_PATH = os.path.join("outputs", "xgb_final.json")
 
+explainer = None
+
 if os.path.exists(MODEL_PATH):
     print(f"Loading model from {MODEL_PATH}...")
     model = xgb.Booster()
     model.load_model(MODEL_PATH)
     print("Model loaded successfully.")
+    
+    # Initialize SHAP explainer
+    print("Initializing SHAP explainer...")
+    explainer = shap.TreeExplainer(model)
+    print("SHAP explainer ready.")
 else:
     print(f"WARNING: Model not found at {MODEL_PATH}")
     model = None
@@ -66,9 +74,30 @@ def predict():
         # Predict
         scores = model.predict(dtest)
         
+        # Calculate SHAP values for explanation
+        shap_vals = explainer.shap_values(dtest)
+        base_value = explainer.expected_value
+        
+        # Format SHAP values for the first record
+        explanation = []
+        if len(shap_vals) > 0:
+            # shap_vals is a matrix (rows x cols), take first row
+            vals = shap_vals[0]
+            base = float(base_value) if isinstance(base_value, (float, int)) else float(base_value[0])
+            
+            for i, col in enumerate(EXPECTED_FEATURES):
+                explanation.append({
+                    "feature": col,
+                    "value": float(vals[i])
+                })
+        
         # Return results
         response = {
             "predictions": [float(s) for s in scores],
+            "explanation": {
+                "base_value": base if 'base' in locals() else 0,
+                "values": explanation
+            },
             "status": "success"
         }
         return jsonify(response)
