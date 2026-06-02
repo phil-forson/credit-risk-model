@@ -40,9 +40,11 @@ EXPECTED_FEATURES = [
     "R_1_mean3", "S_3_mean6"
 ]
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return "Credit Default Prediction API is running. Use /predict endpoint."
+    if request.method == 'GET':
+        return "Credit Default Prediction API is running. Use /predict endpoint."
+    return predict()
 
 @app.route('/predict', methods=['POST'])
 def predict():
